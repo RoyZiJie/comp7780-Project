@@ -112,9 +112,9 @@ Home Page: http://localhost:3000/home
 
 Product Page: http://localhost:3000/product
 
-## 💳 PayPal Sandbox Testing
+💳 PayPal Sandbox Testing
 
-### Test Accounts
+Test Accounts
 
 You can use PayPal's sandbox test accounts to simulate payments:
 
@@ -123,7 +123,7 @@ You can use PayPal's sandbox test accounts to simulate payments:
 3. Use the default buyer account (e.g., `sb-xxxxxx@personal.example.com`)
 4. Default password: `123456789`
 
-### Test Payment Flow
+Test Payment Flow
 
 1. Add products to cart on the product page
 2. Open shopping cart sidebar
@@ -132,9 +132,9 @@ You can use PayPal's sandbox test accounts to simulate payments:
 5. Complete the payment
 6. Verify order is saved in database with `status = 'completed'`
 
-## 📊 Database Schema
+📊 Database Schema
 
-```sql
+sql
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id VARCHAR(100) NOT NULL UNIQUE,
