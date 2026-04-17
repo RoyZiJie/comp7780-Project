@@ -54,8 +54,8 @@ document.addEventListener('click', (e) => {
   // Remove item from cart
   const removeBtn = e.target.closest('.remove-item');
   if (removeBtn) {
-  const id = parseInt(removeBtn.dataset.id);
-  removeFromCart(id);
+    const id = parseInt(removeBtn.dataset.id);
+    removeFromCart(id);
   }
 });
 
@@ -130,23 +130,16 @@ function updateCartDisplay() {
   const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   cartTotal.textContent = totalPrice.toFixed(2);
   
-  // Enable/disable checkout button and update its data-href
-  if (totalPrice > 0) {
-    checkoutBtn.disabled = false;
-    checkoutBtn.setAttribute('aria-disabled', 'false');
-    checkoutBtn.dataset.href = `https://www.paypal.com/checkout?amount=${totalPrice.toFixed(2)}&currency=HKD`;
-  } else {
-    checkoutBtn.disabled = true;
-    checkoutBtn.setAttribute('aria-disabled', 'true');
-    checkoutBtn.removeAttribute('data-href');
-  }
-  
   // Clear the shopping cart item container
   cartItemsContainer.innerHTML = '';
   
   // Check if the shopping cart is empty
   if (cart.length === 0) {
     emptyCartMessage.style.display = 'block';
+    // Hide PayPal container, show original button
+    const container = document.getElementById('paypal-button-container');
+    if (container) container.style.display = 'none';
+    if (checkoutBtn) checkoutBtn.style.display = 'block';
     return;
   }
   
@@ -181,6 +174,33 @@ function updateCartDisplay() {
     `;
     cartItemsContainer.appendChild(cartItemElement);
   });
+  
+  // Handle PayPal button display
+  if (totalPrice > 0) {
+    // Ensure container exists
+    let container = document.getElementById('paypal-button-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'paypal-button-container';
+      container.style.marginTop = '15px';
+      if (checkoutBtn && checkoutBtn.parentNode) {
+        checkoutBtn.parentNode.insertBefore(container, checkoutBtn);
+      }
+    }
+    
+    // Hide original button, show PayPal container
+    container.style.display = 'block';
+    if (checkoutBtn) checkoutBtn.style.display = 'none';
+    
+    // Initialize PayPal button if not already initialized
+    if (!window.paypalInitialized) {
+      initPayPalButtons();
+    }
+  } else {
+    const container = document.getElementById('paypal-button-container');
+    if (container) container.style.display = 'none';
+    if (checkoutBtn) checkoutBtn.style.display = 'block';
+  }
 }
 
 // Display message
@@ -227,9 +247,154 @@ function showMessage(text) {
 // Initialize shopping cart display
 updateCartDisplay();
 
-// Open PayPal in new tab when checkout button clicked (only when enabled)
-checkoutBtn.addEventListener('click', (e) => {
-  if (checkoutBtn.disabled) return;
-  const url = checkoutBtn.dataset.href || 'https://www.paypal.com/signin';
-  window.open(url, '_blank');
-});
+// ========== PayPal Backend Integration ==========
+
+// Get cart data for API
+function getCartForAPI() {
+    const totalAmount = parseFloat(cartTotal.textContent);
+    const items = cart.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+    }));
+    return { totalAmount, items, cartData: cart };
+}
+
+// Create order on backend
+async function createOrderOnBackend() {
+    const { totalAmount, items, cartData } = getCartForAPI();
+    
+    if (totalAmount <= 0) {
+        showMessage('❌ Your cart is empty!');
+        return null;
+    }
+    
+    try {
+        const response = await fetch('/api/paypal/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: totalAmount,
+                currency: 'HKD',
+                items: items,
+                cartData: cartData
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            return data.orderID;
+        } else {
+            showMessage('❌ ' + data.error);
+            return null;
+        }
+    } catch (error) {
+        showMessage('❌ Network error');
+        return null;
+    }
+}
+
+// Capture payment on backend
+async function captureOrderOnBackend(orderID) {
+    const payerName = prompt('📝 Enter your name:', 'Green World Customer') || 'Guest';
+    const payerEmail = prompt('📧 Enter your email:', 'customer@example.com') || 'No email';
+    
+    try {
+        const response = await fetch('/api/paypal/capture-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderID, payerName, payerEmail })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage('✅ Payment successful! Thank you! 🎉');
+            cart = [];
+            updateCartDisplay();
+            cartSidebar.classList.remove('active');
+            cartOverlay.classList.remove('active');
+            return true;
+        } else {
+            showMessage('❌ Payment failed: ' + data.error);
+            return false;
+        }
+    } catch (error) {
+        showMessage('❌ Payment verification failed');
+        return false;
+    }
+}
+
+// Load PayPal SDK
+function loadPayPalSDK() {
+    return new Promise((resolve, reject) => {
+        if (document.querySelector('#paypal-sdk')) {
+            resolve();
+            return;
+        }
+        
+        // PayPal Client ID
+        const paypalClientId = 'ARTBk-SiJjYqZji_hblclL7r0y1czLXDPllq9ThdQONIWLUFPAtHX5s6L-wNkgNfIJVH42P_mp--1Gjv';
+        
+        const script = document.createElement('script');
+        script.id = 'paypal-sdk';
+        script.src = `https://www.paypal.com/sdk/js?client-id=${paypalClientId}&currency=HKD`;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('PayPal SDK failed to load'));
+        document.body.appendChild(script);
+    });
+}
+
+// Initialize PayPal buttons
+let paypalInitialized = false;
+
+async function initPayPalButtons() {
+    // Prevent duplicate initialization
+    if (paypalInitialized) return;
+    
+    // Check if container already has PayPal button content
+    const container = document.getElementById('paypal-button-container');
+    if (container && container.hasChildNodes()) {
+        console.log('PayPal button already exists, skip initialization');
+        paypalInitialized = true;
+        window.paypalInitialized = true;
+        return;
+    }
+    
+    try {
+        await loadPayPalSDK();
+        
+        let retries = 0;
+        while (typeof paypal === 'undefined' && retries < 20) {
+            await new Promise(r => setTimeout(r, 200));
+            retries++;
+        }
+        
+        if (typeof paypal === 'undefined' || !paypal.Buttons) {
+            console.error('PayPal unavailable');
+            return;
+        }
+        
+        paypal.Buttons({
+            createOrder: async () => {
+                const orderID = await createOrderOnBackend();
+                if (!orderID) throw new Error('Unable to create order');
+                return orderID;
+            },
+            onApprove: async (data) => {
+                await captureOrderOnBackend(data.orderID);
+            },
+            onCancel: () => showMessage('Payment cancelled.'),
+            onError: (err) => {
+                console.error(err);
+                showMessage('Payment error. Please try again.');
+            }
+        }).render('#paypal-button-container');
+        
+        paypalInitialized = true;
+        window.paypalInitialized = true;
+        
+    } catch (error) {
+        console.error('PayPal initialization failed:', error);
+    }
+}

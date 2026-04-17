@@ -1,0 +1,16 @@
+CREATE DATABASE IF NOT EXISTS green_world;
+USE green_world;
+
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(100) NOT NULL UNIQUE,
+    payer_id VARCHAR(100),
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'HKD',
+    status VARCHAR(50) DEFAULT 'pending',
+    items JSON,
+    payer_name VARCHAR(200),
+    payer_email VARCHAR(200),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
