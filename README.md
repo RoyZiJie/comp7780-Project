@@ -39,26 +39,29 @@ A full-stack e-commerce web application for Green World, a Hong Kong-based recyc
 - **Development Tools:** Nodemon
 
 ## 📁 Project Structure
+
+```
 green-world-eshop/
-├── server.js # Main application entry point
-├── package.json # Project dependencies
-├── .env # Environment variables
-├── comp7780_home.html # Home page
-├── comp7780_product.html # Product page
+├── server.js                 # Main application entry point
+├── package.json              # Project dependencies
+├── .env                      # Environment variables
+├── comp7780_home.html        # Home page
+├── comp7780_product.html     # Product page
 ├── css/
-│ ├── styles.css # Home page styles
-│ └── styles2.css # Product page styles
+│   ├── styles.css            # Home page styles
+│   └── styles2.css           # Product page styles
 ├── js/
-│ └── script.js # Frontend JavaScript (cart & PayPal)
+│   └── script.js             # Frontend JavaScript (cart & PayPal)
 ├── config/
-│ └── database.js # MySQL database connection
+│   └── database.js           # MySQL database connection
 ├── controllers/
-│ └── paypalController.js # PayPal API handlers
+│   └── paypalController.js   # PayPal API handlers
 ├── routes/
-│ └── paypal.js # PayPal API routes
+│   └── paypal.js             # PayPal API routes
 ├── db/
-│ └── database.sql # Database schema
-└── images/ # Product images
+│   └── database.sql          # Database schema
+└── images/                   # Product images
+```
 
 ## 🚀 Installation & Setup
 
@@ -109,33 +112,29 @@ Home Page: http://localhost:3000/home
 
 Product Page: http://localhost:3000/product
 
-💳 PayPal Sandbox Testing
-Test Accounts
+## 💳 PayPal Sandbox Testing
+
+### Test Accounts
+
 You can use PayPal's sandbox test accounts to simulate payments:
 
-Login to PayPal Developer Dashboard
+1. Login to [PayPal Developer Dashboard](https://developer.paypal.com/)
+2. Navigate to **Sandbox > Accounts**
+3. Use the default buyer account (e.g., `sb-xxxxxx@personal.example.com`)
+4. Default password: `123456789`
 
-Navigate to Sandbox > Accounts
+### Test Payment Flow
 
-Use the default buyer account (e.g., sb-xxxxxx@personal.example.com)
+1. Add products to cart on the product page
+2. Open shopping cart sidebar
+3. Click the PayPal button
+4. Login with sandbox buyer account
+5. Complete the payment
+6. Verify order is saved in database with `status = 'completed'`
 
-Default password: 123456789
+## 📊 Database Schema
 
-est Payment Flow
-Add products to cart on the product page
-
-Open shopping cart sidebar
-
-Click the PayPal button
-
-Login with sandbox buyer account
-
-Complete the payment
-
-Verify order is saved in database with status = 'completed'
-
-📊 Database Schema
-
+```sql
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id VARCHAR(100) NOT NULL UNIQUE,
@@ -149,40 +148,41 @@ CREATE TABLE orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-🔗 API Endpoints
-Endpoint	Method	Description
-/api/paypal/create-order	POST	Create PayPal order
-/api/paypal/capture-order	POST	Capture PayPal payment
-/api/orders	GET	Retrieve all orders
+```
+## 🔗 API Endpoints
 
-Features
-Product Catalog: 12 eco-friendly products across 4 categories
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/paypal/create-order` | POST | Create PayPal order |
+| `/api/paypal/capture-order` | POST | Capture PayPal payment |
+| `/api/orders` | GET | Retrieve all orders |
 
-Shopping Cart: Add/remove items, adjust quantities
+## 🎨 Features
 
-PayPal Integration: Secure sandbox payment processing
+- **Product Catalog:** 12 eco-friendly products across 4 categories
+- **Shopping Cart:** Add/remove items, adjust quantities
+- **PayPal Integration:** Secure sandbox payment processing
+- **Order Management:** Automatic order storage in MySQL
+- **Responsive Design:** Mobile-friendly layout
+- **Team Information:** Student details displayed in table format (R6)
 
-Order Management: Automatic order storage in MySQL
+## 📝 Notes
 
-Responsive Design: Mobile-friendly layout
+- The project uses PayPal Sandbox mode for testing – no real money is transferred
+- All products are sample data representing recycled/donated items
+- The application meets all COMP 7780 assignment requirements
+- **Never commit `.env` file to version control** (contains sensitive credentials)
 
-Team Information: Student details displayed in table format (R6)
+## 👨‍💻 Developer
 
-📝 Notes
-The project uses PayPal Sandbox mode for testing – no real money is transferred
+**Zhang Zijie (Roy)** - Developer  
+GitHub: [https://github.com/RoyZiJie/comp7780-Project](https://github.com/RoyZiJie/comp7780-Project)
 
-All products are sample data representing recycled/donated items
+## 📅 Last Updated
 
-The application meets all COMP 7780 assignment requirements
-
-👨‍💻 Developer
-Zhang Zijie (Roy) - Developer
-GitHub: [https://github.com/RoyZiJie/comp7780-Project]
-
-
-📅 Last Updated
 April 2026
 
-© 2026 Green World | HKBU COMP 7780
+---
 
+© 2026 Green World | HKBU COMP 7780
 
