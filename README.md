@@ -6,11 +6,11 @@ A full-stack e-commerce web application for Green World, a Hong Kong-based recyc
 
 | Name | Role | Student ID |
 |------|------|-------------|
-| Hu duoduo | Analyst | 25469932 |
-| Xie Tianqing | Analyst | 25469851 |
-| Gao Yikai | Project Manager | 25442570 |
-| Xiang Jingwei | Tester | 25422022 |
-| Lam Hoikiu | Tester | 25450441 |
+| Hu duoduo | Scrum Master | 25469932 |
+| Xie Tianqing | Developer | 25469851 |
+| Gao Yikai | Scrum Master | 25442570 |
+| Xiang Jingwei | Scrum Master | 25422022 |
+| Lam Hoikiu | Scrum Master | 25450441 |
 | Zhang Zijie | Developer | 25456296 |
 
 **Team No.:** 23  
@@ -111,6 +111,15 @@ Step 6: Access the Application
 Home Page: http://localhost:3000/home
 
 Product Page: http://localhost:3000/product
+
+Step 7: Review Order Information
+# 1. Log in to MySQL 
+mysql -u root -p
+Enter password: your database password 
+# 2. Switch to the "green_world" database 
+USE green_world;
+# 3. View Order Information 
+SELECT id, order_id, amount, status, payer_name, created_at FROM orders;
 
 💳 PayPal Sandbox Testing
 
