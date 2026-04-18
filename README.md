@@ -185,6 +185,7 @@ CREATE TABLE orders (
 ## 👨‍💻 Developer
 
 **Zhang Zijie (Roy)** - Developer  
+**Xie Tianqing** - Developer  
 GitHub: [https://github.com/RoyZiJie/comp7780-Project](https://github.com/RoyZiJie/comp7780-Project)
 
 ## 📅 Last Updated
