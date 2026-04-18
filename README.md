@@ -8,7 +8,7 @@ A full-stack e-commerce web application for Green World, a Hong Kong-based recyc
 |------|------|-------------|
 | Hu duoduo | Scrum Master | 25469932 |
 | Xie Tianqing | Developer | 25469851 |
-| Gao Yikai | Scrum Master | 25442570 |
+| Gao Yikai | Developer | 25442570 |
 | Xiang Jingwei | Scrum Master | 25422022 |
 | Lam Hoikiu | Scrum Master | 25450441 |
 | Zhang Zijie | Developer | 25456296 |
